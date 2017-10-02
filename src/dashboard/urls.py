@@ -1,4 +1,4 @@
-"""iotDashboard URL Configuration
+"""dashboard URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -16,6 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+from main_app.views import TemplateView
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', TemplateView.as_view()),
+    url(r'^dashboard/', TemplateView.as_view(template_name="dashboard/dashboard.html"))
 ]
