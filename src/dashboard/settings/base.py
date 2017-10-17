@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from cassandra import ConsistencyLevel
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -31,12 +32,16 @@ ALLOWED_HOSTS = ['192.168.0.104']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_cassandra_engine',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'main_app',
 ]
 
 MIDDLEWARE = [
@@ -77,7 +82,31 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    },
+    'cassandra': {
+            'ENGINE': 'django_cassandra_engine',
+            'NAME': 'db',
+            'USER': 'user',
+            'PASSWORD': 'pass',
+            'TEST_NAME': 'test_db',
+            'HOST': '127.0.0.1',
+            'OPTIONS': {
+                'replication': {
+                    'strategy_class': 'SimpleStrategy',
+                    'replication_factor': 1
+                },
+                'connection': {
+                    'consistency': ConsistencyLevel.LOCAL_ONE,
+                    'retry_connect': True
+                    # + All connection options for cassandra.cluster.Cluster()
+                },
+                'session': {
+                    'default_timeout': 10,
+                    'default_fetch_size': 10000
+                    # + All options for cassandra.cluster.Session()
+                }
+            }
+        }
 }
 
 
@@ -118,3 +147,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+#SESSION_ENGINE = 'django_cassandra_engine.sessions.backends.db'
+CASSANDRA_FALLBACK_ORDER_BY_PYTHON = True
